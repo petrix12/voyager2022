@@ -126,7 +126,54 @@
 
 
 ## Bread
-### 4. Crear nueva tabla### 
+### 4. Crear nueva tabla
+1. Crear una tabla con el panel administrativo de Voyager:
+    + Ir: Tools -> Database -> Clic en Crear tabla
+    + Nombre de la tabla: products
+    + ¿Generar el modelo?: Sí, por favor
+    + Campos:
+        ```
+        + Nombre: id            /   Tipo: INTEGER
+        + Nombre: name          /   Tipo: VARCHAR
+        + Nombre: description   /   Tipo: TEXT
+        + Nombre: image_url     /   Tipo: VARCHAR
+        + Nombre: order         /   Tipo: INTEGER   / Defecto: 1
+        + Nombre: user_id       /   Tipo: INTEGER
+        ```
+    + Para añadir los campos **created_at** y **updated_at** presionar **Añadir Timestamps**.
+    + Para añadir el campo **deleted_at** presionar **Añadir Soft Deletes**. (luego eliminar este campo)
+    + Clic en **Crear tabla**.
+
+### 5. Implementar nuevo Bread
+1. Crear un CRUD con el panel administrativo de Voyager:
+    + Ir: Tools -> Database -> al lado de la tabla **products** clic en **Añadir BREAD a esta tabla**.
+    + Completar formulario:
+        + Nombre para mostrar (Singular): Producto
+        + Nombre para mostrar (Plural): Productos
+        + Slug (debe ser único): products
+        + Ícono (opcional) Use una clase de Voyager Fonts: voyager-ticket
+        + Generar permisos: Si
+        + Clic a **Enviar**.
+
+### 6. Elegir el tipo de campo del formulario
+1. Modificar Formularios para el products con el panel administrativo de Voyager:
+    + Ir: Tools -> Database -> clic en el botón **Editar** correspondiente a **products**.
+    + En **Editar las filas de la tabla siguiente** realizar las adaptaciones.
+    + ![Imagen campos products 1](/00recursos/img/product1.png)
+    + ![Imagen campos products 2](/00recursos/img/product2.png)
+    + ![Imagen campos products 3](/00recursos/img/product3.png)
+
+### 7. Agregar relaciones
+1. Crear relaciones para el products con el panel administrativo de Voyager:
+    + Ir: Tools -> Database -> clic en el botón **Editar** correspondiente a **products**.
+    + Presionar el botón **Crear una relación**.
+    + Establecer relación products-users (n:1)
+        + Product: BelongsTo    /   User    /   App\Models\User
+        + ¿Qué columna de Product se usará para hacer referencia a User?: user_id
+        + Mostrar de User: name
+        + Guardar de User: id
+    + Clic en **Crear relación**.
+    + ![Relación products-users](/00recursos/img/relacion_products.png)
 
 
 
@@ -137,9 +184,6 @@
 
 
 
-### 5. Implementar nuevo Bread
-### 6. Elegir el tipo de campo del formulario
-### 7. Agregar relaciones
 ### 8. Tagging
 ### 9. Opciones avanzadas (relaciones)
 ### 10. Validaciones
