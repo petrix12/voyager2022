@@ -425,7 +425,7 @@
     }
     ```
 
-## Menus
+## Menús
 ### 19. Crear y editar menús
 1. Para personilzar menú desde el panel de administración de Voyager:
     + Ir a Tools -> Menu Builder -> Clic en el botón **Constructor**.
@@ -653,26 +653,273 @@
 ### 24. Roles y permisos
 
 
-## Personalizacion
+## Personalización
 ### 25. Personalización de plantilla
+1. Para personalizar la vista **products** crear **resources\views\vendor\voyager\products\browse.blade.php**:
+    + En caso de querer modificar por completo:
+    ```php
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Vista personalizada products</h1>
+    </body>
+    </html>
+    ```
+    + En caso de solo querer anexar información:
+    ```php
+    @extends('voyager::bread.browse')
 
+    @section('content')
+        @parent
+        <p>Aquí se podrá anexar información</p>
+    @endsection
+    ```
+    + En caso de rediseñar la plantilla:
+    ```php
+    @extends('voyager::bread.browse')
 
+    @section('content')
+        <div class="page-content browse container-fluid">
+            @include('voyager::alerts')
+            <div class="row">
+                ≡
+                CÓDIGO EXTRAIDO DE vendor\tcg\voyager\resources\views\bread\browse.blade.php
+                ≡
+            </div>
+        </div>
 
+        {{-- Single delete modal --}}
+        <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager::generic.delete_question') }}
+                            {{ strtolower($dataType->getTranslatedAttribute('display_name_singular')) }}?</h4>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="#" id="delete_form" method="POST">
+                            {{ method_field('DELETE') }}
+                            {{ csrf_field() }}
+                            <input type="submit" class="btn btn-danger pull-right delete-confirm"
+                                value="{{ __('voyager::generic.delete_confirm') }}">
+                        </form>
+                        <button type="button" class="btn btn-default pull-right"
+                            data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    @endsection
+    ```
+    + **Nota**: el nombre de la ruta y del archivo no deben alterarse para que Voyager lo reconozca.
+    + **Ubicación de las plantillas de Voyager por defecto**: vendor\tcg\voyager\resources\views\bread
 
 ### 26. JS y CSS adicional
-### 27. Mostrar posts
-### 28. Mostrar páginas
-
-
-
-
-
-
-
-
+1. Crear **public\css\custom.css**:
+    ```css
+    /* Escribir código css */
+    p {
+        color: blue;
+    }
+    ```
+2. Crear **public\js\custom.js**:
+    ```js
+    /* Escribir código js */
+    alert('Probando.....')
+    ```
+3. Para incluir los archivos anteriores en Voyager, modificar **config\voyager.php**:
     ```php
+    ≡
+    // Here you can specify additional assets you would like to be included in the master.blade
+    'additional_css' => [
+        'css/custom.css',
+    ],
+
+    'additional_js' => [
+        'js/custom.js',
+    ],
     ≡
     ```
 
+### 27. Mostrar posts
+1. Eliminar del menú **Posts** en **Tablero  -> Menus  -> Builder -> main**.
+2. Modificar archivo de rutas **routes\web.php**:
+    ```php
+    ≡
+    use App\Http\Controllers\PostController;
+    use Illuminate\Support\Facades\Route;
+    ≡
+    Route::get('/', [PostController::class, 'index'])->name('welcome');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+    Route::get('/about', function () {
+    })->name('about');
 
+    Route::get('/policy', function () {
+    })->name('policy');
+    ≡
+    ```
+3. Crear controlador para **Post**:
+    + $ php artisan make:controller PostController
+4. Programar controlador **app\Http\Controllers\PostController.php**:
+    ```php
+    ≡
+    use Illuminate\Http\Request;
+    use TCG\Voyager\Models\Post;
 
+    class PostController extends Controller
+    {
+        public function index(){
+            $posts = Post::paginate();
+            return view('welcome', compact('posts'));
+        }
+
+        public function show(Post $post){
+            return view('posts.show', compact('post'));
+        }
+    }
+    ```
+5. Rediseñar vista **resources\views\welcome.blade.php**:
+    ```php
+    <x-app-layout>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-2xl font-semibold text-center mb-8">{{ setting('site.title') }}</h1>
+            <ul class="space-y-8">
+                @foreach ($posts as $post)
+                    <li>
+                        <article>
+                            <h2 class="text 2xl font-semibold">
+                                <a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+                            </h2>
+                            <figure>
+                                <img src="{{ Voyager::image($post->image) }}" alt="{{ $post->title }}" class="aspect-[3/1] object-cover">
+                            </figure>
+                            <p>{{ $post->excerpt }}</p>
+                        </article>
+                    </li>
+                @endforeach
+            </ul>
+            {{ $posts->links() }}
+        </div>
+    </x-app-layout>
+    ```
+6. Crear vista **resources\views\posts\show.blade.php**:
+    ```php
+    <x-app-layout :title="$post->seo_title">
+        @push('meta')
+            <meta name="description" content="{{ $post->meta_description }}">
+        @endpush
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-2xl font-semibold mb-4">{{ $post->title }}</h1>
+            <p>{{ $post->excerpt }}</p>
+            <figure class="mb-4">
+                <img src="{{ Voyager::image($post->image) }}" alt="{{ $post->title }}" class="aspect-[3/1] object-cover">
+            </figure>
+            <div>
+                {!! $post->body !!}
+            </div>
+        </div>
+    </x-app-layout>
+    ```
+7. Modificar layout **resources\views\layouts\app.blade.php**:
+    ```php
+    @props(['title' => config('app.name', 'Laravel')])
+    <!DOCTYPE html>
+    <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+        <head>
+            ≡
+            @stack('meta')
+            <title>{{ $title }}</title>
+            ≡
+        </head>
+        <body class="font-sans antialiased">
+            ≡
+        </body>
+    </html>
+    ```
+
+### 28. Mostrar páginas
+1. Crear página con Voyager:
+    + Ir al panel administrativo de Voyager.
+    + Ir a **Pages**.
+    + Presionar **Crear**:
+        + Title: Nosotros
+        + Slug: about
+        + Status: ACTIVE
+        + Meta Keywords: Pruebas
+        + Rellenar los otros campos con cualquier valor.
+    + Crear otra página con valores de prueba y en **Slug** colocar **policy**.
+2. Crear controlador para **Page**:
+    + $ php artisan make:controller PageController
+3. Modificar archivo de rutas **routes\web.php**:
+    ```php
+    ≡
+    use App\Http\Controllers\PageController;
+    use App\Http\Controllers\PostController;
+    use Illuminate\Support\Facades\Route;
+    ≡
+    Route::get('/about', [PageController::class, 'about'])->name('about');
+    Route::get('/policy', [PageController::class, 'policy'])->name('policy');
+    ≡
+    ```
+4. Programar controlador **app\Http\Controllers\PageController.php**:
+    ```php
+    <?php
+
+    namespace App\Http\Controllers;
+
+    use Illuminate\Http\Request;
+    use TCG\Voyager\Models\Page;
+
+    class PageController extends Controller
+    {
+        public function about(){
+            $page = Page::where('slug', 'about')->firstOrFail();
+            return view('pages.about', compact('page'));
+        }
+
+        public function policy(){
+            $page = Page::where('slug', 'policy')->firstOrFail();
+            return view('pages.policy', compact('page'));
+        }
+    }
+    ```
+5. Crear vista **resources\views\pages\about.blade.php**:
+    ```php
+    <x-app-layout>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-4xl font-semibold text-center mb-4">{{ $page->title }}</h1>
+            <div class="mb-4">
+                {!! $page->body !!}
+            </div>
+            @if($page->image)
+                <figure>
+                    <img src="{{ Voyager::image($page->image) }}" alt="{{ $page->title }}" class="aspect-[4/3] object-cover">
+                </figure>
+            @endif>
+        </div>
+    </x-app-layout>
+    ```
+6. Crear vista **resources\views\pages\policy.blade.php**:
+    ```php
+    <x-app-layout>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-4xl font-semibold text-center mb-4">{{ $page->title }}</h1>
+            <div class="mb-4">
+                {!! $page->body !!}
+            </div>
+            @if($page->image)
+                <figure>
+                    <img src="{{ Voyager::image($page->image) }}" alt="{{ $page->title }}" class="aspect-[4/3] object-cover">
+                </figure>
+            @endif
+        </div>
+    </x-app-layout>
+    ```

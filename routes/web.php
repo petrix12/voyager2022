@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,21 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [PostController::class, 'index'])->name('welcome');
 
-Route::get('/posts', function () {
-})->name('posts.index');
+Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
-Route::get('/posts/{post}', function () {
-})->name('posts.show');
+Route::get('/about', [PageController::class, 'about'])->name('about');
 
-Route::get('/about', function () {
-})->name('about');
-
-Route::get('/policy', function () {
-})->name('policy');
+Route::get('/policy', [PageController::class, 'policy'])->name('policy');
 
 Route::middleware([
     'auth:sanctum',
