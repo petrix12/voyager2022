@@ -620,33 +620,45 @@
 
 ## Conceptos básicos
 ### 21. Enrutamiento
-
-
-
-
-
-
-
-
+1. Para cambiar el nombre de la ruta **admin** modificar el archivo de rutas **routes\web.php**:
     ```php
-    ≡
+    Route::group(['prefix' => 'admin'], function () {
+        Voyager::routes();
+    });
     ```
 
-
-
-
-
-
-
-
 ### 22. Settings
+1. Para personalizar el panel administrativo ir a **Settings**.
+2. Modificar vista **resources\views\welcome.blade.php**:
+    ```php
+    <x-app-layout>
+        <h1 class="text-2xl font-semibold text-center">{{ setting('site.title') }}</h1>
+    </x-app-layout>
+    ```
+3. Modificar menú **resources\views\my-menu.blade.php**:
+    ```php
+    <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900" x-data="{ open: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between items-center">
+                <a href="/" class="flex items-center">
+                    <img src="{{ Voyager::image(setting('site.logo')) }}" class="mr-3 h-6 sm:h-10" alt="Flowbite Logo">
+                </a>
+                ≡
+            </div>
+        </div>
+    </nav>
+    ```
+
 ### 23. Compass
 ### 24. Roles y permisos
 
 
-
 ## Personalizacion
 ### 25. Personalización de plantilla
+
+
+
+
 ### 26. JS y CSS adicional
 ### 27. Mostrar posts
 ### 28. Mostrar páginas

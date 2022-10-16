@@ -1,9 +1,8 @@
 <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900" x-data="{ open: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-wrap justify-between items-center">
-            <a href="#" class="flex items-center">
-                <img src="https://flowbite.com/docs/images/logo.svg" class="mr-3 h-6 sm:h-10" alt="Flowbite Logo">
-                <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
+            <a href="/" class="flex items-center">
+                <img src="{{ Voyager::image(setting('site.logo')) }}" class="mr-3 h-6 sm:h-10" alt="Flowbite Logo">
             </a>
             <button @click="open = !open" type="button"
                 class="inline-flex justify-center items-center ml-3 text-gray-400 rounded-lg md:hidden hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-400 dark:hover:text-white dark:focus:ring-gray-500"
